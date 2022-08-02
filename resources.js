@@ -12,6 +12,16 @@ exports.random_choice = function(array) {
 	return array[Math.floor((Math.random()*array.length))];
 }
 
+exports.process_select = function() {
+	for (const [value, details] of Object.entries(mod.items)) {
+		option_list.push({
+			label: details.label,
+			description: details.description,
+			value: value
+		});
+	}
+}
+
 exports.author_embed = function() {
 	const colour = config.colour ?? config.color ?? null;
 	if (colour !== null) {

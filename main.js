@@ -31,9 +31,11 @@ for (const file of select_files) {
 		}
 		
 	} else {
-		for (const [value, item] of Object.entries(mod.items)) {
-			if (item.response !== undefined && item.response !== null) {
-				throw new Error(file + ": For individual item responses to be used on a select, the minimum and maximum options must be 1 and there must be no overall response function.");
+		if (mod.items !== undefined && mod.items !== null) {
+			for (const [value, item] of Object.entries(mod.items)) {
+				if (item.response !== undefined && item.response !== null) {
+					throw new Error(file + ": For individual item responses to be used on a select, the minimum and maximum options must be 1 and there must be no overall response function.");
+				}
 			}
 		}
 		select_responses[name] = mod.response;
@@ -105,7 +107,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 // Change this if you want to give the bot a custom status
 async function change_status() {
 	while (true) {
-		client.user.setActivity('YOU', { type: 'LISTENING' });
+		client.user.setActivity('you', { type: 'WATCHING' });
 		await sleep(1000 * 60 * 2);
 	}
 }
@@ -113,10 +115,10 @@ async function change_status() {
 client.on('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	// Uncomment to use custom status:
-	//change_status().catch(e => {
-	//	console.log("Status change failed:");
-	//	console.log(e);
-	//});
+	change_status().catch(e => {
+		console.log("Status change failed:");
+		console.log(e);
+	});
 });
 
 client.on('interactionCreate', async interaction => {
