@@ -10,7 +10,7 @@ exports.response = async function(interaction) {
     const rules = JSON.parse(fs.readFileSync('./rules.json'));
     for (var i = 0; i < rules.length; i++) {
         var embed = new MessageEmbed()
-            .setTitle(rules[i].title)
+            .setTitle(i.toString() + ". " + rules[i].title)
             .setDescription(rules[i].content)
         interaction.channel.send({embeds: [embed]})
     }
