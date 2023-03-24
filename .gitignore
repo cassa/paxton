@@ -1,4 +1,5 @@
+# Environment
+.env
+
+# NPM
 node_modules/
-package_lock.json
-config.json
-rules.json
