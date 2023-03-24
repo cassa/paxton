@@ -1,5 +1,5 @@
 
-const { Client, GatewayIntentBits, Routes, Collection, Events, REST } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, Events, ActivityType } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -30,20 +30,16 @@ for (const file of commandFiles) {
 	}
 }
 
-const updatePresence = async (c, state) => {
-	c.user.setPresence({
-		activites: [{
-			name: 'you',
-			type: 'WATCHING',
-		}],
-		state
-	});
-};
-
 client.once(Events.ClientReady, async c => {
 	console.log(`Ready! Logged in as ${c.user.tag}!`);
 	
-	await updatePresence(c);
+	c.user.setPresence({
+		activities: [{
+			name: 'you!',
+			type: ActivityType.Watching,
+		}],
+		state: 'dnd',
+	});
 });
 
 client.on(Events.InteractionCreate, async interaction => {
