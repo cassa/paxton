@@ -1,4 +1,20 @@
 {
+  "name": "paxton",
+  "version": "1.0.0",
+  "description": "Paxton is a good bot.",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cassa/paxton"
+  },
+  "author": {
+    "name": "CASSA"
+  },
+  "license": "GPL3",
   "dependencies": {
     "discord.js": "^14.8.0",
     "dotenv": "^16.0.3"
