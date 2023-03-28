@@ -11,7 +11,7 @@
     "style": "prettier --write --ignore-unknown ."
   },
   "lint-staged": {
-    "*.js": [
+    "**/*.js": [
       "eslint --fix",
       "prettier --write --ignore-unknown"
     ]
