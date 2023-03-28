@@ -42,7 +42,7 @@ module.exports = {
             interaction.options.getString('reason') ?? 'No reason provided';
 
         await targetMember
-            .ban(target, {
+            .ban({
                 deleteMessageSeconds: CHAT_PURGE_SECONDS,
                 reason,
             })

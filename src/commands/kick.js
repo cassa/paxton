@@ -1,7 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
-const CHAT_PURGE_SECONDS = 60 * 60 * 24 * 7;
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('kick')
@@ -42,10 +40,7 @@ module.exports = {
             interaction.options.getString('reason') ?? 'No reason provided';
 
         await targetMember
-            .kick(target, {
-                deleteMessageSeconds: CHAT_PURGE_SECONDS,
-                reason,
-            })
+            .kick(reason)
             .then(() => {
                 interaction.reply({
                     content: `Kicking ${target.username} for reason: ${reason}`,
