@@ -5,7 +5,16 @@
   "private": true,
   "main": "src/index.js",
   "scripts": {
-    "start": "node ."
+    "start": "node .",
+    "prepare": "husky install",
+    "lint": "eslint --fix .",
+    "style": "prettier --write --ignore-unknown ."
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write --ignore-unknown"
+    ]
   },
   "repository": {
     "type": "git",
@@ -18,5 +27,12 @@
   "dependencies": {
     "discord.js": "^14.8.0",
     "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^8.8.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.0",
+    "prettier": "2.8.7"
   }
 }

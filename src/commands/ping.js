@@ -1,13 +1,21 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('ping')
-        .setDescription('Replies with Pong!')
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-    
+        .setDescription('Replies with Pong!'),
+
     async execute(interaction) {
-        const sent = await interaction.reply({ content: 'Pinging...', fetchReply: true });
-        interaction.editReply(`Websocket heartbeat: ${interaction.client.ws.ping}ms.\nRoundtrip latency: ${sent.createdTimestamp - interaction.createdTimestamp}ms`);
-    }
+        const sent = await interaction.reply({
+            content: 'Pinging...',
+            fetchReply: true,
+        });
+        interaction.editReply(
+            `Websocket heartbeat: ${
+                interaction.client.ws.ping
+            }ms.\nRoundtrip latency: ${
+                sent.createdTimestamp - interaction.createdTimestamp
+            }ms`
+        );
+    },
 };
