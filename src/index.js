@@ -15,8 +15,10 @@ const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildModeration],
 });
 
-// Load commands found under the 'commands/' directory into a collection.
 client.commands = new Collection();
+client.cooldowns = new Collection();
+
+// Load commands found under the 'commands/' directory into a collection.
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs
     .readdirSync(commandsPath)
@@ -53,7 +55,7 @@ client.once(Events.ClientReady, async (c) => {
 client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
-    const command = interaction.client.commands.get(interaction.commandName);
+    const command = client.commands.get(interaction.commandName);
 
     if (!command) {
         console.error(
@@ -61,6 +63,32 @@ client.on(Events.InteractionCreate, async (interaction) => {
         );
         return;
     }
+
+    const { cooldowns } = client;
+
+    if (!cooldowns.has(command.data.name)) {
+        cooldowns.set(command.data.name, new Collection());
+    }
+
+    const now = Date.now();
+    const timestamps = cooldowns.get(command.data.name);
+    const defaultCooldownSeconds = 3;
+    const cooldownMs = (command.cooldown ?? defaultCooldownSeconds) * 1000;
+
+    if (timestamps.has(interaction.user.id)) {
+        const expirationMs = timestamps.get(interaction.user.id) + cooldownMs;
+
+        if (now < expirationMs) {
+            const expiredTimestamp = Math.round(expirationMs / 1000);
+            return interaction.reply({
+                content: `Please wait <t:${expiredTimestamp}:R> seconds before reusing the \`${command.data.name}\` command.`,
+                ephemeral: true,
+            });
+        }
+    }
+
+    timestamps.set(interaction.user.id, now);
+    setTimeout(() => timestamps.delete(interaction.user.id), cooldownMs);
 
     try {
         await command.execute(interaction);
