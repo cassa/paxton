@@ -76,14 +76,24 @@ client.on(Events.InteractionCreate, async (interaction) => {
     const cooldownMs = (command.cooldown ?? defaultCooldownSeconds) * 1000;
 
     if (timestamps.has(interaction.user.id)) {
-        const expirationMs = timestamps.get(interaction.user.id) + cooldownMs;
+        const expirationTimestamp =
+            timestamps.get(interaction.user.id) + cooldownMs;
 
-        if (now < expirationMs) {
-            const expiredTimestamp = Math.round(expirationMs / 1000);
-            return interaction.reply({
-                content: `Please wait <t:${expiredTimestamp}:R> seconds before reusing the \`${command.data.name}\` command.`,
+        if (now < expirationTimestamp) {
+            const timeLeft = Math.floor(expirationTimestamp / 1000);
+            interaction.reply({
+                content: `Please wait <t:${timeLeft}:R> seconds before reusing the \`${command.data.name}\` command.`,
                 ephemeral: true,
             });
+            setTimeout(
+                () =>
+                    interaction.editReply({
+                        content: `You can now use the \`${command.data.name}\` command again!`,
+                        ephemeral: true,
+                    }),
+                expirationTimestamp - now
+            );
+            return;
         }
     }
 
