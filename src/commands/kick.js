@@ -1,4 +1,10 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const {
+    SlashCommandBuilder,
+    PermissionFlagsBits,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+} = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,8 +24,10 @@ module.exports = {
 
     async execute(interaction) {
         const target = interaction.options.getUser('target');
-        const targetMember = interaction.guild.members.cache.get(target.id);
+        const reason =
+            interaction.options.getString('reason') ?? 'No reason provided';
 
+        const targetMember = interaction.guild.members.cache.get(target.id);
         if (!targetMember) {
             await interaction.reply({
                 content: `Failed to kick ${target.username} because they are no longer in the guild.`,
@@ -36,23 +44,50 @@ module.exports = {
             return;
         }
 
-        const reason =
-            interaction.options.getString('reason') ?? 'No reason provided';
+        const confirmButton = new ButtonBuilder()
+            .setCustomId('confirm')
+            .setLabel('Confirm Kick')
+            .setStyle(ButtonStyle.Danger);
 
-        await targetMember
-            .kick(reason)
-            .then(() => {
-                interaction.reply({
-                    content: `Kicking ${target.username} for reason: ${reason}`,
-                    ephemeral: true,
-                });
-            })
-            .catch((error) => {
-                interaction.reply({
-                    content: `Failed to kick ${target.username}: ${error.message}`,
-                    ephemeral: true,
-                });
-                console.error(error);
+        const cancelButton = new ButtonBuilder()
+            .setCustomId('cancel')
+            .setLabel('Cancel Kick')
+            .setStyle(ButtonStyle.Secondary);
+
+        const row = new ActionRowBuilder().addComponents([
+            confirmButton,
+            cancelButton,
+        ]);
+
+        const response = await interaction.reply({
+            content: `Are you sure you want to kick ${target.username} for reason: ${reason}?`,
+            components: [row],
+        });
+
+        const filter = (i) => i.user.id === interaction.user.id;
+        try {
+            const confirmation = await response.awaitMessageComponent({
+                filter,
+                time: 60 * 1000,
             });
+
+            if (confirmation.customId === 'confirm') {
+                await targetMember.kick(reason);
+                await interaction.editReply({
+                    content: `${target.username} has been kicked for reason: ${reason}`,
+                    components: [],
+                });
+            } else {
+                await interaction.editReply({
+                    content: `Kick cancelled.`,
+                    components: [],
+                });
+            }
+        } catch (error) {
+            await interaction.editReply({
+                content: `Timed out waiting for response from ${interaction.user.username}.`,
+                components: [],
+            });
+        }
     },
 };
