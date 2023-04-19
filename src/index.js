@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
+const { loadCommands } = require('./load-commands');
 
 // Configure environment variables on launch.
 require('dotenv').config();
@@ -12,24 +13,8 @@ const client = new Client({
 client.commands = new Collection();
 client.cooldowns = new Collection();
 
-// Load commands found under the 'commands/' directory into a collection.
-const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs
-    .readdirSync(commandsPath)
-    .filter((file) => file.endsWith('.js'));
-
-for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
-
-    // Set a new item in the Collection with the key as the command name and the value as the exported module.
-    if ('data' in command && 'execute' in command) {
-        client.commands.set(command.data.name, command);
-    } else {
-        console.log(
-            `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-        );
-    }
+for (const command of loadCommands()) {
+    client.commands.set(command.name, command.command);
 }
 
 const eventsPath = path.join(__dirname, 'events');
